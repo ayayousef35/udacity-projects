@@ -1,115 +1,108 @@
-// */ 
-//  * 
-//  * Manipulating the DOM exercise.
-//  * Exercise programmatically builds navigation,
-//  * scrolls to anchors from navigation,
-//  * and highlights section in viewport upon scrolling.
-//  * 
-//  * Dependencies: None
-//  * 
-//  * JS Version: ES2015/ES6
-//  * 
-//  * JS Standard: ESlint
-//  * 
-// */
-// counter to specify attributes and number of section
-let conuter = 0;
+/**
+ * 
+ * Manipulating the DOM exercise.
+ * Exercise programmatically builds navigation,
+ * scrolls to anchors from navigation,
+ * and highlights section in viewport upon scrolling.
+ * 
+ * Dependencies: None
+ * 
+ * JS Version: ES2015/ES6
+ * 
+ * JS Standard: ESlint
+ * 
+*/
 
-const createNewSection = () => {
-    conuter++;
-    // section HTML Content
-    const content =`<section id="section${conuter}" data-nav="Section ${conuter}">
-    <div class="landing__container">
-    <h2>Section ${conuter}</h2>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi fermentum metus faucibus lectus pharetra dapibus. Suspendisse potenti. Aenean aliquam elementum mi, ac euismod augue. Donec eget lacinia ex. Phasellus imperdiet porta orci eget mollis. Sed convallis sollicitudin mauris ac tincidunt. Donec bibendum, nulla eget bibendum consectetur, sem nisi aliquam leo, ut pulvinar quam nunc eu augue. Pellentesque maximus imperdiet elit a pharetra. Duis lectus mi, aliquam in mi quis, aliquam porttitor lacus. Morbi a tincidunt felis. Sed leo nunc, pharetra et elementum non, faucibus vitae elit. Integer nec libero venenatis libero ultricies molestie semper in tellus. Sed congue et odio sed euismod.</p>
+/**
+ * Comments should be present at the beginning of each procedure and class.
+ * Great to have comments before crucial code sections within the procedure.
+*/
 
-    <p>Aliquam a convallis justo. Vivamus venenatis, erat eget pulvinar gravida, ipsum lacus aliquet velit, vel luctus diam ipsum a diam. Cras eu tincidunt arcu, vitae rhoncus purus. Vestibulum fermentum consectetur porttitor. Suspendisse imperdiet porttitor tortor, eget elementum tortor mollis non.</p>
+/**
+ * Define Global Variables
+ * 
+*/
+const navBar = document.getElementById('navbar__list') ;
+const secTions = document.querySelectorAll('section');
+const fraGment = document.createDocumentFragment();
 
-    </div>
-    </section> `;
-    document.querySelector('main').insertAdjacentHTML("beforeend",content);
-};
-
-// make list items equal to the number of sections by iterate on them
-// but i need to remove all items to avoid the duplicating
-const navBar= document.getElementById("navbar__list");
-const createListItem = () =>{
-    navBar.innerHTML = "";
-    document.querySelectorAll("section").forEach((section) => {
-        const listItem = `<li> <a href="#${section.id}" data-nav="${section.id}" class="menu__link">${section.dataset.nav}</a> </li>`;
-        navBar.insertAdjacentHTML("beforeend",listItem);
-
+/**
+ * End Global Variables
+ * Start Helper Functions
+ * 
+*/
+function buildNavigationMenu(){
+secTions.forEach(function(section){
+    const sectionID =section.id;
+    const conTent =section.dataset.nav;
+    const sectionItem = document.createElement('li');
+    const sectionLink = document.createElement('a');
+    sectionLink.href =`#${sectionID}`;
+    sectionLink.classList ='menu__link';
+    sectionLink.textContent =conTent;
+    sectionLink.addEventListener('click',function(e){
+        e.preventDefault(); 
+        section.scrollIntoView({
+            behavior:'smooth',
+        });
     });
- 
+    sectionItem.appendChild(sectionLink);
+    fraGment.appendChild(sectionItem);
+});
+navBar.appendChild(fraGment);
+}
+window.addEventListener('load',buildNavigationMenu);
 
-};
+
+/**
+ * End Helper Functions
+ * Begin Main Functions
+ * 
+*/
+
+// build the nav
+
+
+// Add class 'active' to section when near top of viewport
+
+
+// Scroll to anchor ID using scrollTO event
+
+
+/**
+ * End Main Functions
+ * Begin Events
+ * 
+*/
+
+// Build menu 
 
 // Scroll to section on link click
 
-// Set sections as active
-// function to observe the section to specify which section on the viewport and its link
+function activeSection(entries) {
+    const activeLink = document.querySelector (`a[href="#${entries[0].target.id}"]`);
+    if(entries[0].isIntersecting) {
+        entries[0].target.classList.add("your-active-class")
+        activeLink.classList.add("active-link")
+    }else{
+        entries[0].target.classList.remove("your-active-class")
+        activeLink.classList.remove("active-link")
 
-const observingSection = () => {
-    const observer = new IntersectionObserver(
-        function (entries){
-            // loop over entries "sections"
-
-            entries.forEach((entry) => {
-                // get active link by using the id of the section viewport 
-
-                let activeSection= navBar.querySelector(`[data-nav=${entry.target.id}]`);
-                // add active class to the section on viewport and the sections link
-
-                if (entry.isIntersecting){
-                    entry.target.classList.add("your-active-class");
-                    activeSection.classList.add("active-link");
-
-                   // edit the hash of loction manual cause i prevent default behavior , and remove active classes
-                }else{ location.hash =`${entry.target.id}`;
-                    entry.target.classList.remove("your-active-class");
-                    activeSection.classList.remove("active-link");
-                }
-                
-            });
-        },
-        {
-            // option
-            threshold:.7,
-        }
-
-    );
-    // return this part of code because i will use it twice
-    return document.querySelectorAll("section").forEach((section) =>{
-        observer.observe(section);
-    });
+    };
+}
+    const options = {
+        root:null,
+        rootMargin:'0px',
+        threshold: 0.65,
+    };
     
-};
+    const obserVing = new IntersectionObserver(activeSection,options);
+    window.addEventListener('scroll',function(){
+        for (const section of secTions){
+            obserVing.observe(section);
+        }
+    });
 
-
-
-
-
-
-
-
-
-
-
-
-
-// Build menu 
-// Create Four Sections As Dynamic
-for (let i = 1; i <5; i++) {createNewSection();}
-// Call Function For Create List  Items in Navbar
-createListItem();
-// Call Function  For Set sections as active
-observingSection();
-// Add New Section By Button
-document.getElementById("btn").addEventListener("click",() =>{
-    createNewSection();
-    createListItem();
-    observingSection();
-})
-
+// Set sections as active
 
 
